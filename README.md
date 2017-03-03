@@ -1,9 +1,6 @@
 # Lab code (WIP), but call for comments
 
-This is code for labs covered in TensorFlow basic tutorials (in Korean) at https://www.youtube.com/watch?v=BS6O0zOGX4E&list=PLlMkM4tgfjnLSOjrEJN31gZATbcj_MpUm. 
-(We also have a plan to record videos in English.)
-
-This is work in progress, and may have bugs. 
+This is work in progress, and may have bugs. (lab-08 is in WIP.)
 However, we call for your comments and pull requests. Check out our style guide line:
 
 * More TF (1.0) style: use more recent and decent TF APIs.
