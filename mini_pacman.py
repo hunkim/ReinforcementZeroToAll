@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # 장애물 회피 게임 즉, 자율주행차:-D 게임을 구현합니다.
-#  Author: 김진중 https://github.com/golbin/TensorFlow-Tutorials
+# Original author: 김진중 https://github.com/golbin/TensorFlow-Tutorials
+# TODO: change comments in English
 import numpy as np
 import random
 
