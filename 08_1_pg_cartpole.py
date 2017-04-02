@@ -99,6 +99,8 @@ for step in range(max_num_episodes):
         if done:
             # Determine standardized rewards
             discounted_rewards = discount_rewards(rewards)
+            # Normalization
+            discounted_rewards = (discounted_rewards - discounted_rewards.mean())/(discounted_rewards.std() + 1e-7)
             l, _ = sess.run([loss, train],
                             feed_dict={X: xs, Y: ys, advantages: discounted_rewards})
 
