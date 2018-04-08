@@ -1,57 +1,96 @@
-# https://medium.com/emergent-future/simple-reinforcement-learning-with-tensorflow-part-0-q-learning-with-tables-and-neural-networks-d195264329d0#.pjz9g59ap
+"""
+FrozenLake solver using Q-table
+https://medium.com/emergent-future/simple-reinforcement-learning-with-tensorflow-part-0-q-learning-with-tables-and-neural-networks-d195264329d0#.pjz9g59ap
+"""
+
+import time
 
 import gym
-from gym import wrappers
-
 import numpy as np
-import matplotlib.pyplot as plt
+
+import utils.prints as print_utils
+
+N_ACTIONS = 4
+N_STATES = 16
+
+LEARNING_RATE = .85
+DISCOUNT_RATE = .99
+
+N_EPISODES = 2000
 
 
-env = gym.make('FrozenLake-v0')
-env = wrappers.Monitor(env, "gym-results")
+def main():
+    """Main"""
+    frozone_lake_env = gym.make("FrozenLake-v0")
 
-action_space_n = 4
-state_space_n = 16
+    # Initialize table with all zeros
+    Q = np.zeros([N_STATES, N_ACTIONS])
 
-# Initialize table with all zeros
-Q = np.zeros([state_space_n, action_space_n])
+    # Set learning parameters
 
-# Set learning parameters
-learning_rate = .85
-dis = .99
-num_episodes = 2000
+    # create lists to contain total rewards and steps per episode
+    rewards = []
 
-# create lists to contain total rewards and steps per episode
-rList = []
-for i in range(num_episodes):
-    # Reset environment and get first new observation
-    state = env.reset()
-    rAll = 0
-    done = False
+    for i in range(N_EPISODES):
+        # Reset environment and get first new observation
+        state = frozone_lake_env.reset()
+        episode_reward = 0
+        done = False
 
-    # The Q-Table learning algorithm
-    while not done:
-        # Choose an action by greedily (with noise) picking from Q table
-        action = np.argmax(Q[state, :] + np.random.randn(1,
-                                                         action_space_n) / (i + 1))
+        # The Q-Table learning algorithm
+        while not done:
+            # Choose an action by greedily (with noise) picking from Q table
+            action = np.argmax(Q[state, :] + np.random.randn(1, N_ACTIONS) /
+                               (i + 1))
 
-        # Get new state and reward from environment
-        new_state, reward, done, _ = env.step(action)
+            # Get new state and reward from environment
+            new_state, reward, done, _ = frozone_lake_env.step(action)
 
-        # Update Q-Table with new knowledge using learning rate
-        Q[state, action] = (1 - learning_rate) * Q[state, action] \
-            + learning_rate * (reward + dis * np.max(Q[new_state, :]))
+            # Update Q-Table with new knowledge using learning rate
+            Q[state, action] = (
+                1 - LEARNING_RATE) * Q[state, action] + LEARNING_RATE * (
+                    reward + DISCOUNT_RATE * np.max(Q[new_state, :]))
 
-        rAll += reward
-        state = new_state
+            episode_reward += reward
+            state = new_state
 
-    rList.append(rAll)
+        rewards.append(episode_reward)
 
-env.close()
-gym.upload("gym-results", api_key="sk_VT2wPcSSOylnlPORltmQ")
+    print("Score over time: " + str(sum(rewards) / N_EPISODES))
+    print("Final Q-Table Values")
 
-print("Score over time: " + str(sum(rList) / num_episodes))
-print("Final Q-Table Values")
-print(Q)
-plt.bar(range(len(rList)), rList, color="blue")
-plt.show()
+    for i in range(10):
+        # Reset environment and get first new observation
+        state = frozone_lake_env.reset()
+        episode_reward = 0
+        done = False
+
+        # The Q-Table learning algorithm
+        while not done:
+            # Choose an action by greedily (with noise) picking from Q table
+            action = np.argmax(Q[state, :])
+
+            # Get new state and reward from environment
+            new_state, reward, done, _ = frozone_lake_env.step(action)
+            print_utils.clear_screen()
+            frozone_lake_env.render()
+            time.sleep(.1)
+
+            # Update Q-Table with new knowledge using learning rate
+            Q[state, action] = (1 - LEARNING_RATE) * Q[state, action] \
+                + LEARNING_RATE * (reward + DISCOUNT_RATE * np.max(Q[new_state, :]))
+
+            episode_reward += reward
+            state = new_state
+
+            if done:
+                print("Episode Reward: {}".format(episode_reward))
+                print_utils.print_result(episode_reward)
+
+        rewards.append(episode_reward)
+
+    frozone_lake_env.close()
+
+
+if __name__ == '__main__':
+    main()
