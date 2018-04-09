@@ -13,11 +13,10 @@ import utils.prints as print_utils
 N_ACTIONS = 4
 N_STATES = 16
 
-LEARNING_RATE = .85
-DISCOUNT_RATE = .99
+LEARNING_RATE = .5
+DISCOUNT_RATE = .98
 
 N_EPISODES = 2000
-
 
 def main():
     """Main"""
@@ -40,11 +39,13 @@ def main():
         # The Q-Table learning algorithm
         while not done:
             # Choose an action by greedily (with noise) picking from Q table
-            action = np.argmax(Q[state, :] + np.random.randn(1, N_ACTIONS) /
-                               (i + 1))
+            noise = np.random.randn(1, N_ACTIONS) / (i + 1)
+            action = np.argmax(Q[state, :] + noise)
 
             # Get new state and reward from environment
             new_state, reward, done, _ = frozone_lake_env.step(action)
+
+            reward = -1 if done and reward < 1 else reward
 
             # Update Q-Table with new knowledge using learning rate
             Q[state, action] = (
@@ -75,10 +76,6 @@ def main():
             print_utils.clear_screen()
             frozone_lake_env.render()
             time.sleep(.1)
-
-            # Update Q-Table with new knowledge using learning rate
-            Q[state, action] = (1 - LEARNING_RATE) * Q[state, action] \
-                + LEARNING_RATE * (reward + DISCOUNT_RATE * np.max(Q[new_state, :]))
 
             episode_reward += reward
             state = new_state
